@@ -1,0 +1,72 @@
+--Columns in customers table are order_id, acctnum
+SELECT * FROM BIT_DB.customers LIMIT 20
+;
+
+--Columns in JanSales table are orderID, Product, Quantity, price, orderdate, location
+SELECT * FROM BIT_DB.JanSales LIMIT 20
+;
+
+--order_id messy data = "Order ID" and "..." use AND order_id <> 'Order ID' and/or WHERE length(order_id) = 6 
+SELECT * FROM BIT_DB.customers
+;
+
+--1. Jan orders
+SELECT COUNT(orderID)
+FROM BIT_DB.JanSales
+WHERE length(orderId) = 6
+AND orderId <> 'Order ID'
+AND Product = 'iPhone'
+;
+
+--2. iphone orders Jan
+SELECT distinct acctnum 
+FROM BIT_DB.customers cust
+INNER JOIN BIT_DB.FebSales Feb
+ON Feb.orderID = cust.order_id
+WHERE length(orderId) = 6
+AND orderID <> 'Order ID'
+;
+
+--3. Acc Numbers for Feb orders
+SELECT distinct acctnum
+FROM BIT_DB.customers cust
+INNER JOIN BIT_DB.FebSales Feb
+ON cust.order_id=FEB.orderid
+WHERE length(orderid) = 6
+AND orderid <> 'Order ID';
+SELECT distinct Product, price 
+FROM BIT_DB.JanSales
+ORDER BY price ASC
+LIMIT 1
+;
+
+--4. Cheapest Prod sold in Jan
+SELECT product, min(price)
+FROM BIT_DB.JanSales Jan
+GROUP BY product, price
+ORDER BY price ASC
+LIMIT 1;
+
+--5. Total Revenue for each Prod sold in Jan
+SELECT Product, SUM(Quantity)*Price as Revenue
+FROM BIT_DB.JanSales
+GROUP BY Product
+;
+
+--6. Feb sells at 548 Lincoln St, Seattle, WA 98101
+SELECT Product, location, quantity, 
+SUM(Quantity)*Price as Revenue
+FROM BIT_DB.FebSales
+WHERE location = '548 Lincoln St, Seattle, WA 98101'
+GROUP BY Product
+;
+
+--7. Quantity of customers in FEb who ordered more than 2 products and avg spent
+SELECT COUNT(Distinct Cust.acctnum), AVG(Quantity*Price) as Avg_Price
+FROM BIT_DB.FebSales Feb
+LEFT JOIN Bit_DB.customers Cust
+ON Feb.orderID=Cust.order_id
+WHERE Feb.Quantity>2
+AND length(orderId) = 6
+AND orderID <> 'Order ID'
+;
